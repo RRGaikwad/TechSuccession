@@ -45,6 +45,12 @@ export interface PricingPlan {
   color: string;
 }
 
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 export const initialProjects: Project[] = [
   {
     id: '1',
@@ -238,6 +244,49 @@ export const initialPricingPlans: PricingPlan[] = [
     ],
     popular: false,
     color: 'from-green-500 to-emerald-400',
+  },
+];
+
+export const initialFAQs: FAQItem[] = [
+  {
+    id: '1',
+    question: 'How long does development take?',
+    answer: 'Most projects are completed within 1–7 days depending on the complexity and scope. Simple websites can be done in 1-2 days, while full management software may take up to 7 days. We use AI-assisted development to speed up the process significantly.',
+  },
+  {
+    id: '2',
+    question: 'Do you provide hosting?',
+    answer: 'Yes! We provide complete hosting solutions. Your website/app will be deployed on fast, reliable servers with SSL certificates included. We handle all the technical setup so you don\'t have to worry about anything.',
+  },
+  {
+    id: '3',
+    question: 'Can you build custom software for my specific business?',
+    answer: 'Absolutely! Every business is unique, and we specialize in building custom solutions tailored to your specific workflow. Whether you run a print shop, restaurant, salon, or coaching class — we design software around YOUR operations.',
+  },
+  {
+    id: '4',
+    question: 'Will my app work on mobile phones?',
+    answer: 'Yes! Every application we build is mobile-first. This means it\'s designed for smartphone users first and works perfectly on all devices — phones, tablets, and desktops. PWAs can even be installed like native apps.',
+  },
+  {
+    id: '5',
+    question: 'Do you provide support after delivery?',
+    answer: 'Yes, we provide free support depending on the plan (1-3 months). After that, we offer affordable maintenance plans. We\'re always available on WhatsApp for quick questions and bug fixes.',
+  },
+  {
+    id: '6',
+    question: 'What technologies do you use?',
+    answer: 'We use modern, battle-tested technologies including React, React Native, Firebase, Node.js, and AI/ML tools. This ensures your software is fast, scalable, and future-proof.',
+  },
+  {
+    id: '7',
+    question: 'How do payments work?',
+    answer: 'We typically work with 50% advance and 50% on delivery. For larger projects, we can arrange milestone-based payments. We accept UPI, bank transfer, and all major payment methods.',
+  },
+  {
+    id: '8',
+    question: 'Can I see a demo before starting?',
+    answer: 'Yes! We can show you demos of similar projects we\'ve built. We also provide mockups/wireframes before starting development so you know exactly what you\'re getting.',
   },
 ];
 

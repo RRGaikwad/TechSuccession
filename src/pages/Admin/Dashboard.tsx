@@ -8,6 +8,7 @@ import {
   MessageSquare, 
   CreditCard,
   Phone,
+  HelpCircle,
   LogOut,
   ChevronRight,
   ExternalLink,
@@ -19,6 +20,7 @@ import ManageServices from './ManageServices';
 import ManageTestimonials from './ManageTestimonials';
 import ManagePricing from './ManagePricing';
 import ManageContact from './ManageContact';
+import ManageFAQ from './ManageFAQ';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 const SidebarItem = ({ to, icon: Icon, label, active, onClick }: { to: string, icon: any, label: string, active: boolean, onClick?: () => void }) => (
@@ -106,6 +108,13 @@ const AdminDashboard = () => {
             onClick={closeSidebar}
           />
           <SidebarItem 
+            to="/admin/faq" 
+            icon={HelpCircle} 
+            label="FAQ" 
+            active={location.pathname === '/admin/faq'} 
+            onClick={closeSidebar}
+          />
+          <SidebarItem 
             to="/admin/contact" 
             icon={Phone} 
             label="Contact Info" 
@@ -168,6 +177,7 @@ const AdminDashboard = () => {
             <Route path="/services" element={<ManageServices />} />
             <Route path="/testimonials" element={<ManageTestimonials />} />
             <Route path="/pricing" element={<ManagePricing />} />
+            <Route path="/faq" element={<ManageFAQ />} />
             <Route path="/contact" element={<ManageContact />} />
           </Routes>
         </div>

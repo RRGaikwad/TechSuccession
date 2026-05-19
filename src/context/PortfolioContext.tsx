@@ -5,11 +5,13 @@ import {
   Testimonial, 
   ContactInfo,
   PricingPlan,
+  FAQItem,
   initialProjects, 
   initialServices, 
   initialTestimonials,
   initialContactInfo,
-  initialPricingPlans
+  initialPricingPlans,
+  initialFAQs
 } from '../data/portfolioData';
 
 interface PortfolioContextType {
@@ -17,6 +19,7 @@ interface PortfolioContextType {
   services: Service[];
   testimonials: Testimonial[];
   pricingPlans: PricingPlan[];
+  faqs: FAQItem[];
   contactInfo: ContactInfo;
   updateProject: (project: Project) => void;
   addProject: (project: Project) => void;
@@ -31,6 +34,9 @@ interface PortfolioContextType {
   updatePricingPlan: (plan: PricingPlan) => void;
   addPricingPlan: (plan: PricingPlan) => void;
   deletePricingPlan: (id: string) => void;
+  updateFAQ: (faq: FAQItem) => void;
+  addFAQ: (faq: FAQItem) => void;
+  deleteFAQ: (id: string) => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -61,6 +67,11 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return saved ? JSON.parse(saved) : initialPricingPlans;
   });
 
+  const [faqs, setFaqs] = useState<FAQItem[]>(() => {
+    const saved = localStorage.getItem('portfolio_faqs');
+    return saved ? JSON.parse(saved) : initialFAQs;
+  });
+
   useEffect(() => {
     localStorage.setItem('portfolio_projects', JSON.stringify(projects));
   }, [projects]);
@@ -80,6 +91,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     localStorage.setItem('portfolio_pricing', JSON.stringify(pricingPlans));
   }, [pricingPlans]);
+
+  useEffect(() => {
+    localStorage.setItem('portfolio_faqs', JSON.stringify(faqs));
+  }, [faqs]);
 
   const updateProject = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
@@ -133,6 +148,18 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setPricingPlans(prev => prev.filter(p => p.id !== id));
   };
 
+  const updateFAQ = (updatedFAQ: FAQItem) => {
+    setFaqs(prev => prev.map(f => f.id === updatedFAQ.id ? updatedFAQ : f));
+  };
+
+  const addFAQ = (faq: FAQItem) => {
+    setFaqs(prev => [...prev, faq]);
+  };
+
+  const deleteFAQ = (id: string) => {
+    setFaqs(prev => prev.filter(f => f.id !== id));
+  };
+
   return (
     <PortfolioContext.Provider value={{ 
       projects, 
@@ -140,6 +167,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       testimonials, 
       contactInfo,
       pricingPlans,
+      faqs,
       updateProject, 
       addProject, 
       deleteProject,
@@ -152,7 +180,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       updateContactInfo,
       updatePricingPlan,
       addPricingPlan,
-      deletePricingPlan
+      deletePricingPlan,
+      updateFAQ,
+      addFAQ,
+      deleteFAQ
     }}>
       {children}
     </PortfolioContext.Provider>
