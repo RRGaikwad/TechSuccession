@@ -109,14 +109,15 @@ const ManageProjects = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Demo Link</label>
+                  <label className="block text-xs text-slate-400 mb-1">Demo Link (Full URL)</label>
                   <input
                     type="text"
                     value={editForm.demoLink}
                     onChange={(e) => setEditForm({ ...editForm, demoLink: e.target.value })}
                     className="w-full bg-navy-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
-                    placeholder="https://demo.com"
+                    placeholder="https://your-demo-site.com"
                   />
+                  <p className="text-[10px] text-slate-500 mt-1">Make sure to include https:// for external sites.</p>
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Features (comma separated)</label>
@@ -184,12 +185,13 @@ const ManageProjects = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Demo Link</label>
+                  <label className="block text-xs text-slate-400 mb-1">Demo Link (Full URL)</label>
                   <input
                     type="text"
                     value={editForm?.demoLink}
                     onChange={(e) => setEditForm({ ...editForm!, demoLink: e.target.value })}
                     className="w-full bg-navy-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+                    placeholder="https://..."
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

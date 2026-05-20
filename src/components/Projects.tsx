@@ -2,7 +2,13 @@ import { ArrowRight, ExternalLink } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Projects() {
-  const { projects } = usePortfolio();
+  const { projects, trackEvent } = usePortfolio();
+
+  const formatUrl = (url: string) => {
+    if (!url || url === '#') return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `https://${url}`;
+  };
 
   return (
     <section id="projects" className="py-20 md:py-28 relative">
@@ -81,19 +87,23 @@ export default function Projects() {
                   <div className="flex flex-wrap gap-3">
                     <a
                       href="#contact"
+                      onClick={() => trackEvent('cta_click', `Project Contact - ${project.title}`)}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-electric to-accent-purple text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-electric/25 transition-all"
                     >
                       Book Similar App <ArrowRight className="w-4 h-4" />
                     </a>
-                    <a 
-                      href={project.demoLink || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 glass text-white text-sm font-semibold rounded-xl hover:bg-white/5 transition-all"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View Demo
-                    </a>
+                    {formatUrl(project.demoLink || '') && (
+                      <a 
+                        href={formatUrl(project.demoLink || '') || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('cta_click', `Project Demo - ${project.title}`)}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 glass text-white text-sm font-semibold rounded-xl hover:bg-white/5 transition-all"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Demo
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
