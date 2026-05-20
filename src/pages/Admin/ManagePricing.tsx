@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { PricingPlan } from '../../data/portfolioData';
 import { Plus, Edit2, Trash2, X, Check, Star } from 'lucide-react';
