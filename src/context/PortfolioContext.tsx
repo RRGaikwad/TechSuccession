@@ -3,9 +3,7 @@ import { db } from '../firebase';
 import { 
   doc, 
   onSnapshot, 
-  setDoc, 
-  collection,
-  getDocs
+  setDoc
 } from 'firebase/firestore';
 import { 
   Project, 
