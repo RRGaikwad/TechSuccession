@@ -9,7 +9,6 @@ import {
   Eye, 
   MessageSquare, 
   ExternalLink,
-  Smartphone,
   Globe
 } from 'lucide-react';
 
