@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react" // Corrected to /react for Vite/React project
 import Home from './pages/Home';
 import { PortfolioProvider } from './context/PortfolioContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
