@@ -51,22 +51,6 @@ export interface FAQItem {
   answer: string;
 }
 
-export interface AnalyticsEvent {
-  id: string;
-  visitorId: string;
-  type: 'page_view' | 'cta_click' | 'whatsapp_click' | 'form_submit';
-  page: string;
-  label?: string;
-  timestamp: number;
-}
-
-export interface AnalyticsStats {
-  totalViews: number;
-  uniqueVisitors: number;
-  conversionRate: number;
-  avgSessionTime: string;
-}
-
 export const initialProjects: Project[] = [
   {
     id: '1',

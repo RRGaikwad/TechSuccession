@@ -13,8 +13,7 @@ import {
   ChevronRight,
   ExternalLink,
   Menu,
-  X,
-  BarChart3
+  X
 } from 'lucide-react';
 import ManageProjects from './ManageProjects';
 import ManageServices from './ManageServices';
@@ -22,7 +21,6 @@ import ManageTestimonials from './ManageTestimonials';
 import ManagePricing from './ManagePricing';
 import ManageContact from './ManageContact';
 import ManageFAQ from './ManageFAQ';
-import ManageAnalytics from './ManageAnalytics';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 const SidebarItem = ({ to, icon: Icon, label, active, onClick }: { to: string, icon: any, label: string, active: boolean, onClick?: () => void }) => (
@@ -41,10 +39,21 @@ const SidebarItem = ({ to, icon: Icon, label, active, onClick }: { to: string, i
 
 const AdminDashboard = () => {
   const { logout } = useAuth();
-  const { projects, services, testimonials, analyticsEvents } = usePortfolio();
+  const { projects, services, testimonials, isLoading } = usePortfolio();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-navy-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-electric/30 border-t-electric rounded-full animate-spin" />
+          <p className="text-slate-400 font-medium">Connecting to Firebase...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     logout();
@@ -79,13 +88,6 @@ const AdminDashboard = () => {
             icon={LayoutDashboard} 
             label="Dashboard" 
             active={location.pathname === '/admin'} 
-            onClick={closeSidebar}
-          />
-          <SidebarItem 
-            to="/admin/analytics" 
-            icon={BarChart3} 
-            label="Insights" 
-            active={location.pathname === '/admin/analytics'} 
             onClick={closeSidebar}
           />
           <SidebarItem 
@@ -170,15 +172,7 @@ const AdminDashboard = () => {
                   <p className="text-slate-400">Here's what's happening with your portfolio today.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="glass p-6 rounded-2xl">
-                    <div className="flex items-center gap-3 mb-4 text-electric">
-                      <BarChart3 className="w-5 h-5" />
-                      <h3 className="font-semibold">Total Views</h3>
-                    </div>
-                    <div className="text-3xl font-bold text-white">{analyticsEvents.filter(e => e.type === 'page_view').length}</div>
-                    <p className="text-xs text-slate-500 mt-2">Real-time tracking</p>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="glass p-6 rounded-2xl">
                     <div className="flex items-center gap-3 mb-4 text-blue-400">
                       <Briefcase className="w-5 h-5" />
@@ -206,7 +200,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
             } />
-            <Route path="/analytics" element={<ManageAnalytics />} />
             <Route path="/projects" element={<ManageProjects />} />
             <Route path="/services" element={<ManageServices />} />
             <Route path="/testimonials" element={<ManageTestimonials />} />

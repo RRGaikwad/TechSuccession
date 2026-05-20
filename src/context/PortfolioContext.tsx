@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { 
+  doc, 
+  onSnapshot, 
+  setDoc, 
+  collection,
+  getDocs
+} from 'firebase/firestore';
 import { 
   Project, 
   Service, 
@@ -6,7 +14,6 @@ import {
   ContactInfo,
   PricingPlan,
   FAQItem,
-  AnalyticsEvent,
   initialProjects, 
   initialServices, 
   initialTestimonials,
@@ -22,6 +29,7 @@ interface PortfolioContextType {
   pricingPlans: PricingPlan[];
   faqs: FAQItem[];
   contactInfo: ContactInfo;
+  isLoading: boolean;
   updateProject: (project: Project) => void;
   addProject: (project: Project) => void;
   deleteProject: (id: string) => void;
@@ -38,172 +46,130 @@ interface PortfolioContextType {
   updateFAQ: (faq: FAQItem) => void;
   addFAQ: (faq: FAQItem) => void;
   deleteFAQ: (id: string) => void;
-  analyticsEvents: AnalyticsEvent[];
-  trackEvent: (type: AnalyticsEvent['type'], label?: string) => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [projects, setProjects] = useState<Project[]>(() => {
-    const saved = localStorage.getItem('portfolio_projects');
-    return saved ? JSON.parse(saved) : initialProjects;
-  });
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [services, setServices] = useState<Service[]>(initialServices);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(initialContactInfo);
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(initialPricingPlans);
+  const [faqs, setFaqs] = useState<FAQItem[]>(initialFAQs);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [services, setServices] = useState<Service[]>(() => {
-    const saved = localStorage.getItem('portfolio_services');
-    return saved ? JSON.parse(saved) : initialServices;
-  });
-
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
-    const saved = localStorage.getItem('portfolio_testimonials');
-    return saved ? JSON.parse(saved) : initialTestimonials;
-  });
-
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(() => {
-    const saved = localStorage.getItem('portfolio_contact');
-    return saved ? JSON.parse(saved) : initialContactInfo;
-  });
-
-  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(() => {
-    const saved = localStorage.getItem('portfolio_pricing');
-    return saved ? JSON.parse(saved) : initialPricingPlans;
-  });
-
-  const [faqs, setFaqs] = useState<FAQItem[]>(() => {
-    const saved = localStorage.getItem('portfolio_faqs');
-    return saved ? JSON.parse(saved) : initialFAQs;
-  });
-
-  const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>(() => {
-    const saved = localStorage.getItem('portfolio_analytics');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [visitorId] = useState(() => {
-    let id = localStorage.getItem('portfolio_visitor_id');
-    if (!id) {
-      id = 'v_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('portfolio_visitor_id', id);
-    }
-    return id;
-  });
-
-  const lastTrackedPath = useRef<string | null>(null);
-
+  // Sync with Firestore
   useEffect(() => {
-    localStorage.setItem('portfolio_projects', JSON.stringify(projects));
-  }, [projects]);
+    const unsubscribers: (() => void)[] = [];
 
-  useEffect(() => {
-    localStorage.setItem('portfolio_services', JSON.stringify(services));
-  }, [services]);
-
-  useEffect(() => {
-    localStorage.setItem('portfolio_testimonials', JSON.stringify(testimonials));
-  }, [testimonials]);
-
-  useEffect(() => {
-    localStorage.setItem('portfolio_contact', JSON.stringify(contactInfo));
-  }, [contactInfo]);
-
-  useEffect(() => {
-    localStorage.setItem('portfolio_pricing', JSON.stringify(pricingPlans));
-  }, [pricingPlans]);
-
-  useEffect(() => {
-    localStorage.setItem('portfolio_faqs', JSON.stringify(faqs));
-  }, [faqs]);
-
-  useEffect(() => {
-    localStorage.setItem('portfolio_analytics', JSON.stringify(analyticsEvents));
-  }, [analyticsEvents]);
-
-  const trackEvent = (type: AnalyticsEvent['type'], label?: string) => {
-    const newEvent: AnalyticsEvent = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      visitorId,
-      type,
-      page: window.location.pathname,
-      label,
-      timestamp: Date.now(),
+    // Helper to setup real-time listener
+    const setupListener = (collectionName: string, setter: any, initialData: any) => {
+      const unsub = onSnapshot(doc(db, "portfolio", collectionName), (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setter(data.items || data);
+        } else {
+          // If no data in Firebase, initialize it
+          setDoc(doc(db, "portfolio", collectionName), collectionName === 'contact' ? initialData : { items: initialData });
+          setter(initialData);
+        }
+      }, (error) => {
+        console.error(`Error fetching ${collectionName}:`, error);
+        setter(initialData);
+      });
+      unsubscribers.push(unsub);
     };
-    setAnalyticsEvents(prev => [newEvent, ...prev].slice(0, 1000)); // Keep last 1000 events
+
+    setupListener('projects', setProjects, initialProjects);
+    setupListener('services', setServices, initialServices);
+    setupListener('testimonials', setTestimonials, initialTestimonials);
+    setupListener('contact', setContactInfo, initialContactInfo);
+    setupListener('pricing', setPricingPlans, initialPricingPlans);
+    setupListener('faq', setFaqs, initialFAQs);
+
+    setIsLoading(false);
+
+    return () => unsubscribers.forEach(unsub => unsub());
+  }, []);
+
+  const updateProject = async (updatedProject: Project) => {
+    const newItems = projects.map(p => p.id === updatedProject.id ? updatedProject : p);
+    await setDoc(doc(db, "portfolio", "projects"), { items: newItems });
   };
 
-  // Auto-track page views on mount and when path changes
-  useEffect(() => {
-    const currentPath = window.location.pathname;
-    
-    // Only track if the path has actually changed and we haven't tracked it in this session
-    if (lastTrackedPath.current !== currentPath) {
-      trackEvent('page_view');
-      lastTrackedPath.current = currentPath;
-    }
-  }, [window.location.pathname]);
-
-  const updateProject = (updatedProject: Project) => {
-    setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
+  const addProject = async (project: Project) => {
+    const newItems = [...projects, project];
+    await setDoc(doc(db, "portfolio", "projects"), { items: newItems });
   };
 
-  const addProject = (project: Project) => {
-    setProjects(prev => [...prev, project]);
+  const deleteProject = async (id: string) => {
+    const newItems = projects.filter(p => p.id !== id);
+    await setDoc(doc(db, "portfolio", "projects"), { items: newItems });
   };
 
-  const deleteProject = (id: string) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
+  const updateService = async (updatedService: Service) => {
+    const newItems = services.map(s => s.id === updatedService.id ? updatedService : s);
+    await setDoc(doc(db, "portfolio", "services"), { items: newItems });
   };
 
-  const updateService = (updatedService: Service) => {
-    setServices(prev => prev.map(s => s.id === updatedService.id ? updatedService : s));
+  const addService = async (service: Service) => {
+    const newItems = [...services, service];
+    await setDoc(doc(db, "portfolio", "services"), { items: newItems });
   };
 
-  const addService = (service: Service) => {
-    setServices(prev => [...prev, service]);
+  const deleteService = async (id: string) => {
+    const newItems = services.filter(s => s.id !== id);
+    await setDoc(doc(db, "portfolio", "services"), { items: newItems });
   };
 
-  const deleteService = (id: string) => {
-    setServices(prev => prev.filter(s => s.id !== id));
+  const updateTestimonial = async (updatedTestimonial: Testimonial) => {
+    const newItems = testimonials.map(t => t.id === updatedTestimonial.id ? updatedTestimonial : t);
+    await setDoc(doc(db, "portfolio", "testimonials"), { items: newItems });
   };
 
-  const updateTestimonial = (updatedTestimonial: Testimonial) => {
-    setTestimonials(prev => prev.map(t => t.id === updatedTestimonial.id ? updatedTestimonial : t));
+  const addTestimonial = async (testimonial: Testimonial) => {
+    const newItems = [...testimonials, testimonial];
+    await setDoc(doc(db, "portfolio", "testimonials"), { items: newItems });
   };
 
-  const addTestimonial = (testimonial: Testimonial) => {
-    setTestimonials(prev => [...prev, testimonial]);
+  const deleteTestimonial = async (id: string) => {
+    const newItems = testimonials.filter(t => t.id !== id);
+    await setDoc(doc(db, "portfolio", "testimonials"), { items: newItems });
   };
 
-  const deleteTestimonial = (id: string) => {
-    setTestimonials(prev => prev.filter(t => t.id !== id));
+  const updateContactInfo = async (info: ContactInfo) => {
+    await setDoc(doc(db, "portfolio", "contact"), info);
   };
 
-  const updateContactInfo = (info: ContactInfo) => {
-    setContactInfo(info);
+  const updatePricingPlan = async (updatedPlan: PricingPlan) => {
+    const newItems = pricingPlans.map(p => p.id === updatedPlan.id ? updatedPlan : p);
+    await setDoc(doc(db, "portfolio", "pricing"), { items: newItems });
   };
 
-  const updatePricingPlan = (updatedPlan: PricingPlan) => {
-    setPricingPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p));
+  const addPricingPlan = async (plan: PricingPlan) => {
+    const newItems = [...pricingPlans, plan];
+    await setDoc(doc(db, "portfolio", "pricing"), { items: newItems });
   };
 
-  const addPricingPlan = (plan: PricingPlan) => {
-    setPricingPlans(prev => [...prev, plan]);
+  const deletePricingPlan = async (id: string) => {
+    const newItems = pricingPlans.filter(p => p.id !== id);
+    await setDoc(doc(db, "portfolio", "pricing"), { items: newItems });
   };
 
-  const deletePricingPlan = (id: string) => {
-    setPricingPlans(prev => prev.filter(p => p.id !== id));
+  const updateFAQ = async (updatedFAQ: FAQItem) => {
+    const newItems = faqs.map(f => f.id === updatedFAQ.id ? updatedFAQ : f);
+    await setDoc(doc(db, "portfolio", "faq"), { items: newItems });
   };
 
-  const updateFAQ = (updatedFAQ: FAQItem) => {
-    setFaqs(prev => prev.map(f => f.id === updatedFAQ.id ? updatedFAQ : f));
+  const addFAQ = async (faq: FAQItem) => {
+    const newItems = [...faqs, faq];
+    await setDoc(doc(db, "portfolio", "faq"), { items: newItems });
   };
 
-  const addFAQ = (faq: FAQItem) => {
-    setFaqs(prev => [...prev, faq]);
-  };
-
-  const deleteFAQ = (id: string) => {
-    setFaqs(prev => prev.filter(f => f.id !== id));
+  const deleteFAQ = async (id: string) => {
+    const newItems = faqs.filter(f => f.id !== id);
+    await setDoc(doc(db, "portfolio", "faq"), { items: newItems });
   };
 
   return (
@@ -214,6 +180,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       contactInfo,
       pricingPlans,
       faqs,
+      isLoading,
       updateProject, 
       addProject, 
       deleteProject,
@@ -229,9 +196,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       deletePricingPlan,
       updateFAQ,
       addFAQ,
-      deleteFAQ,
-      analyticsEvents,
-      trackEvent
+      deleteFAQ
     }}>
       {children}
     </PortfolioContext.Provider>

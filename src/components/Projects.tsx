@@ -5,7 +5,8 @@ export default function Projects() {
   const { projects, trackEvent } = usePortfolio();
 
   const formatUrl = (url: string) => {
-    if (!url || url === '#') return null;
+    if (!url) return null;
+    if (url === '#') return '#contact'; // Redirect to contact if no link is provided
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     return `https://${url}`;
   };
@@ -87,7 +88,6 @@ export default function Projects() {
                   <div className="flex flex-wrap gap-3">
                     <a
                       href="#contact"
-                      onClick={() => trackEvent('cta_click', `Project Contact - ${project.title}`)}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-electric to-accent-purple text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-electric/25 transition-all"
                     >
                       Book Similar App <ArrowRight className="w-4 h-4" />
@@ -97,7 +97,6 @@ export default function Projects() {
                         href={formatUrl(project.demoLink || '') || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        onClick={() => trackEvent('cta_click', `Project Demo - ${project.title}`)}
                         className="inline-flex items-center gap-2 px-5 py-2.5 glass text-white text-sm font-semibold rounded-xl hover:bg-white/5 transition-all"
                       >
                         <ExternalLink className="w-4 h-4" />
