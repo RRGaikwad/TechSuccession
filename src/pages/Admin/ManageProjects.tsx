@@ -12,6 +12,7 @@ const ManageProjects = () => {
   const startEditing = (project: Project) => {
     setEditingId(project.id);
     setEditForm({ ...project });
+    setIsAdding(false);
   };
 
   const cancelEditing = () => {
@@ -224,9 +225,14 @@ const ManageProjects = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <img src={project.image} alt="" className="w-16 h-16 rounded-lg object-cover" />
-                  <div>
+                  <div className="flex flex-col">
                     <h3 className="text-white font-bold">{project.title}</h3>
                     <p className="text-slate-400 text-sm line-clamp-1">{project.problem}</p>
+                    {project.demoLink && (
+                      <span className="text-electric text-[10px] font-mono mt-1 opacity-70">
+                        Demo: {project.demoLink}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2">

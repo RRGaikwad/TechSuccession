@@ -12,6 +12,7 @@ const ManagePricing = () => {
   const startEditing = (plan: PricingPlan) => {
     setEditingId(plan.id);
     setEditForm({ ...plan });
+    setIsAdding(false);
   };
 
   const cancelEditing = () => {

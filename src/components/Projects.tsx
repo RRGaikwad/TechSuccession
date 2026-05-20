@@ -24,7 +24,7 @@ export default function Projects() {
         <div className="space-y-12">
           {projects.map((project, index) => (
             <div
-              key={project.title}
+              key={project.id}
               className={`glass rounded-3xl overflow-hidden group hover-lift ${
                 index % 2 === 1 ? 'lg:flex-row-reverse' : ''
               }`}

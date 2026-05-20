@@ -12,6 +12,7 @@ const ManageTestimonials = () => {
   const startEditing = (testimonial: Testimonial) => {
     setEditingId(testimonial.id);
     setEditForm({ ...testimonial });
+    setIsAdding(false);
   };
 
   const cancelEditing = () => {

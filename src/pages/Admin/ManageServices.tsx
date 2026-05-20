@@ -12,6 +12,7 @@ const ManageServices = () => {
   const startEditing = (service: Service) => {
     setEditingId(service.id);
     setEditForm({ ...service });
+    setIsAdding(false);
   };
 
   const cancelEditing = () => {
