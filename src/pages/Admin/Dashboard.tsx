@@ -176,8 +176,8 @@ const AdminDashboard = () => {
                       <BarChart3 className="w-5 h-5" />
                       <h3 className="font-semibold">Total Views</h3>
                     </div>
-                    <div className="text-3xl font-bold text-white">{1240 + analyticsEvents.filter(e => e.type === 'page_view').length}</div>
-                    <p className="text-xs text-slate-500 mt-2">+12% from last week</p>
+                    <div className="text-3xl font-bold text-white">{analyticsEvents.filter(e => e.type === 'page_view').length}</div>
+                    <p className="text-xs text-slate-500 mt-2">Real-time tracking</p>
                   </div>
                   <div className="glass p-6 rounded-2xl">
                     <div className="flex items-center gap-3 mb-4 text-blue-400">

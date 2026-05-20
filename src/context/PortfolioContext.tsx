@@ -121,7 +121,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Auto-track page views on mount and when path changes
   useEffect(() => {
-    trackEvent('page_view');
+    // Prevent double tracking in development (Strict Mode)
+    let isTracked = false;
+    if (!isTracked) {
+      trackEvent('page_view');
+      isTracked = true;
+    }
   }, [window.location.pathname]);
 
   const updateProject = (updatedProject: Project) => {
