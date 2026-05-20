@@ -1,5 +1,6 @@
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { trackEvent } from '../firebase';
 
 export default function Projects() {
   const { projects } = usePortfolio();
@@ -88,6 +89,7 @@ export default function Projects() {
                   <div className="flex flex-wrap gap-3">
                     <a
                       href="#contact"
+                      onClick={() => trackEvent('cta_click', { label: `Project Contact - ${project.title}` })}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-electric to-accent-purple text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-electric/25 transition-all"
                     >
                       Book Similar App <ArrowRight className="w-4 h-4" />
@@ -97,6 +99,7 @@ export default function Projects() {
                         href={formatUrl(project.demoLink || '') || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
+                        onClick={() => trackEvent('cta_click', { label: `Project Demo - ${project.title}` })}
                         className="inline-flex items-center gap-2 px-5 py-2.5 glass text-white text-sm font-semibold rounded-xl hover:bg-white/5 transition-all"
                       >
                         <ExternalLink className="w-4 h-4" />
