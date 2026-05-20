@@ -6,17 +6,29 @@ import { Lock } from 'lucide-react';
 const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(password)) {
+    const success = await login(password);
+    if (success) {
       navigate('/admin');
     } else {
       setError('Invalid password');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-navy-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-electric/30 border-t-electric rounded-full animate-spin" />
+          <p className="text-slate-400 font-medium">Preparing secure access...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-navy-900 flex items-center justify-center p-4">

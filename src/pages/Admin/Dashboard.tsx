@@ -21,6 +21,7 @@ import ManageTestimonials from './ManageTestimonials';
 import ManagePricing from './ManagePricing';
 import ManageContact from './ManageContact';
 import ManageFAQ from './ManageFAQ';
+import ManageSettings from './ManageSettings';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 const SidebarItem = ({ to, icon: Icon, label, active, onClick }: { to: string, icon: any, label: string, active: boolean, onClick?: () => void }) => (
@@ -128,8 +129,15 @@ const AdminDashboard = () => {
           <SidebarItem 
             to="/admin/contact" 
             icon={Phone} 
-            label="Contact Info" 
+            label="Contact" 
             active={location.pathname === '/admin/contact'} 
+            onClick={closeSidebar}
+          />
+          <SidebarItem 
+            to="/admin/settings" 
+            icon={Settings} 
+            label="Settings" 
+            active={location.pathname === '/admin/settings'} 
             onClick={closeSidebar}
           />
           
@@ -206,6 +214,7 @@ const AdminDashboard = () => {
             <Route path="/pricing" element={<ManagePricing />} />
             <Route path="/faq" element={<ManageFAQ />} />
             <Route path="/contact" element={<ManageContact />} />
+            <Route path="/settings" element={<ManageSettings />} />
           </Routes>
         </div>
       </main>

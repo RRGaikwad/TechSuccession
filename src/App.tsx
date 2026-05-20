@@ -21,7 +21,19 @@ const PageTracker = () => {
 
 // Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-navy-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-electric/30 border-t-electric rounded-full animate-spin" />
+          <p className="text-slate-400 font-medium">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
 };
 
