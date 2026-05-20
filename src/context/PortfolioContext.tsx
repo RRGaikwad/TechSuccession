@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { 
   Project, 
   Service, 
@@ -80,6 +80,17 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [visitorId] = useState(() => {
+    let id = localStorage.getItem('portfolio_visitor_id');
+    if (!id) {
+      id = 'v_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('portfolio_visitor_id', id);
+    }
+    return id;
+  });
+
+  const lastTrackedPath = useRef<string | null>(null);
+
   useEffect(() => {
     localStorage.setItem('portfolio_projects', JSON.stringify(projects));
   }, [projects]);
@@ -111,6 +122,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const trackEvent = (type: AnalyticsEvent['type'], label?: string) => {
     const newEvent: AnalyticsEvent = {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      visitorId,
       type,
       page: window.location.pathname,
       label,
@@ -121,11 +133,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Auto-track page views on mount and when path changes
   useEffect(() => {
-    // Prevent double tracking in development (Strict Mode)
-    let isTracked = false;
-    if (!isTracked) {
+    const currentPath = window.location.pathname;
+    
+    // Only track if the path has actually changed and we haven't tracked it in this session
+    if (lastTrackedPath.current !== currentPath) {
       trackEvent('page_view');
-      isTracked = true;
+      lastTrackedPath.current = currentPath;
     }
   }, [window.location.pathname]);
 

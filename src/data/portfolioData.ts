@@ -53,6 +53,7 @@ export interface FAQItem {
 
 export interface AnalyticsEvent {
   id: string;
+  visitorId: string;
   type: 'page_view' | 'cta_click' | 'whatsapp_click' | 'form_submit';
   page: string;
   label?: string;

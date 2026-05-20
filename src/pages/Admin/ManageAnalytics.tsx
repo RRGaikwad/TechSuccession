@@ -88,8 +88,8 @@ const ManageAnalytics = () => {
     const pageViews = analyticsEvents.filter(e => e.type === 'page_view');
     const totalViews = pageViews.length;
     
-    // Unique visitors (simplified logic: different pages or significant time gaps)
-    const uniqueVisitors = new Set(pageViews.map(e => e.id.split('.')[0])).size || totalViews;
+    // Unique visitors based on persistent visitorId
+    const uniqueVisitors = new Set(pageViews.map(e => e.visitorId)).size;
 
     const conversions = analyticsEvents.filter(e => e.type === 'whatsapp_click' || e.type === 'form_submit').length;
     const conversionRate = totalViews > 0 ? ((conversions / totalViews) * 100).toFixed(1) : '0.0';
