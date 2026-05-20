@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from "@vercel/analytics/react"
 import Home from './pages/Home';
 import { PortfolioProvider } from './context/PortfolioContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -28,6 +29,7 @@ export default function App() {
               } 
             />
           </Routes>
+          <Analytics />
         </Router>
       </PortfolioProvider>
     </AuthProvider>
