@@ -82,7 +82,8 @@ const ManageAnalytics = () => {
   const stats = useMemo(() => {
     const now = Date.now();
     const fiveMinutesAgo = now - 5 * 60 * 1000;
-    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    // One day timestamp placeholder - uncomment if needed for future analytics calculations
+    // const oneDayAgo = now - 24 * 60 * 60 * 1000;
 
     const pageViews = analyticsEvents.filter(e => e.type === 'page_view');
     const totalViews = pageViews.length;
