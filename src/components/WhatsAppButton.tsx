@@ -2,13 +2,14 @@ import { MessageCircle } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function WhatsAppButton() {
-  const { contactInfo } = usePortfolio();
+  const { contactInfo, trackEvent } = usePortfolio();
 
   return (
     <a
       href={`https://wa.me/91${contactInfo.whatsapp}?text=Hi%2C%20I%20need%20a%20business%20app`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackEvent('whatsapp_click', 'Floating Button')}
       className="fixed bottom-6 right-6 z-50 group"
       aria-label="Chat on WhatsApp"
     >

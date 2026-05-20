@@ -3,7 +3,7 @@ import { Send, MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Contact() {
-  const { contactInfo } = usePortfolio();
+  const { contactInfo, trackEvent } = usePortfolio();
   const [formData, setFormData] = useState({
     name: '',
     business: '',
@@ -44,6 +44,7 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    trackEvent('form_submit', `Requirement Form - ${formData.business}`);
     const message = `Hi! I'm ${formData.name} from ${formData.business}.\n\nRequirement: ${formData.requirement}\nBudget: ${formData.budget}`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/91${contactInfo.whatsapp}?text=${encoded}`, '_blank');
@@ -178,6 +179,7 @@ export default function Contact() {
                   href={`https://wa.me/91${contactInfo.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackEvent('whatsapp_click', 'Contact Section')}
                   className="flex items-center gap-3 text-slate-300 hover:text-[#25D366] transition-colors"
                 >
                   <div className="w-10 h-10 rounded-xl bg-[#25D366]/10 flex items-center justify-center flex-shrink-0">
@@ -190,6 +192,7 @@ export default function Contact() {
                 </a>
                 <a
                   href={`mailto:${contactInfo.email}`}
+                  onClick={() => trackEvent('cta_click', 'Email Link')}
                   className="flex items-center gap-3 text-slate-300 hover:text-electric transition-colors"
                 >
                   <div className="w-10 h-10 rounded-xl bg-electric/10 flex items-center justify-center flex-shrink-0">

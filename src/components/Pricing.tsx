@@ -2,7 +2,7 @@ import { Check, ArrowRight, Star } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Pricing() {
-  const { pricingPlans } = usePortfolio();
+  const { pricingPlans, trackEvent } = usePortfolio();
 
   return (
     <section id="pricing" className="py-20 md:py-28 relative bg-navy-800/30">
@@ -56,6 +56,7 @@ export default function Pricing() {
 
               <a
                 href="#contact"
+                onClick={() => trackEvent('cta_click', `Pricing - ${plan.name}`)}
                 className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all ${
                   plan.popular
                     ? 'bg-gradient-to-r from-electric to-accent-purple text-white hover:shadow-lg hover:shadow-electric/25'
@@ -81,6 +82,7 @@ export default function Pricing() {
             </div>
             <a
               href="#contact"
+              onClick={() => trackEvent('cta_click', 'Pricing - AI Automation')}
               className="whitespace-nowrap inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-yellow-400 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-orange-500/25 transition-all text-base"
             >
               Get Custom Quote <ArrowRight className="w-5 h-5" />

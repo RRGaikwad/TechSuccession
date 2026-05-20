@@ -6,6 +6,7 @@ import {
   ContactInfo,
   PricingPlan,
   FAQItem,
+  AnalyticsEvent,
   initialProjects, 
   initialServices, 
   initialTestimonials,
@@ -37,6 +38,8 @@ interface PortfolioContextType {
   updateFAQ: (faq: FAQItem) => void;
   addFAQ: (faq: FAQItem) => void;
   deleteFAQ: (id: string) => void;
+  analyticsEvents: AnalyticsEvent[];
+  trackEvent: (type: AnalyticsEvent['type'], label?: string) => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -72,6 +75,11 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return saved ? JSON.parse(saved) : initialFAQs;
   });
 
+  const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>(() => {
+    const saved = localStorage.getItem('portfolio_analytics');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('portfolio_projects', JSON.stringify(projects));
   }, [projects]);
@@ -95,6 +103,26 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     localStorage.setItem('portfolio_faqs', JSON.stringify(faqs));
   }, [faqs]);
+
+  useEffect(() => {
+    localStorage.setItem('portfolio_analytics', JSON.stringify(analyticsEvents));
+  }, [analyticsEvents]);
+
+  const trackEvent = (type: AnalyticsEvent['type'], label?: string) => {
+    const newEvent: AnalyticsEvent = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      type,
+      page: window.location.pathname,
+      label,
+      timestamp: Date.now(),
+    };
+    setAnalyticsEvents(prev => [newEvent, ...prev].slice(0, 1000)); // Keep last 1000 events
+  };
+
+  // Auto-track page views on mount and when path changes
+  useEffect(() => {
+    trackEvent('page_view');
+  }, [window.location.pathname]);
 
   const updateProject = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
@@ -183,7 +211,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       deletePricingPlan,
       updateFAQ,
       addFAQ,
-      deleteFAQ
+      deleteFAQ,
+      analyticsEvents,
+      trackEvent
     }}>
       {children}
     </PortfolioContext.Provider>

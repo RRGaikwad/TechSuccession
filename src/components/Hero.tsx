@@ -1,7 +1,10 @@
 import { ArrowRight, MessageCircle, Eye } from 'lucide-react';
 import dashboardMockup from '../assets/images/dashboard-mockup.png';
+import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Hero() {
+  const { contactInfo, trackEvent } = usePortfolio();
+
   return (
     <section className="relative min-h-screen flex items-center bg-grid overflow-hidden pt-20">
       {/* Background Effects */}
@@ -34,6 +37,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a
                 href="#contact"
+                onClick={() => trackEvent('cta_click', 'Hero - Book Consultation')}
                 className="group inline-flex items-center justify-center gap-2 px-7 py-4 bg-gradient-to-r from-electric to-accent-purple text-white font-semibold rounded-2xl hover:shadow-xl hover:shadow-electric/25 transition-all duration-300 text-base"
               >
                 Book Free Consultation
@@ -41,15 +45,17 @@ export default function Hero() {
               </a>
               <a
                 href="#projects"
+                onClick={() => trackEvent('cta_click', 'Hero - View Projects')}
                 className="group inline-flex items-center justify-center gap-2 px-7 py-4 glass text-white font-semibold rounded-2xl hover:bg-white/5 transition-all duration-300 text-base"
               >
                 <Eye className="w-5 h-5" />
                 View Projects
               </a>
               <a
-                href="https://wa.me/919876543210?text=Hi%2C%20I%20need%20a%20business%20app"
+                href={`https://wa.me/91${contactInfo.whatsapp}?text=Hi%2C%20I%20need%20a%20business%20app`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent('whatsapp_click', 'Hero - WhatsApp Me')}
                 className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] font-semibold rounded-2xl hover:bg-[#25D366]/20 transition-all duration-300 text-base"
               >
                 <MessageCircle className="w-5 h-5" />
