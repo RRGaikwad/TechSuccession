@@ -2,7 +2,7 @@ import { ArrowRight, ExternalLink } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Projects() {
-  const { projects, trackEvent } = usePortfolio();
+  const { projects } = usePortfolio();
 
   const formatUrl = (url: string) => {
     if (!url) return null;
